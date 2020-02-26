@@ -82,8 +82,10 @@ int sched_getcpu(void);
 int sched_getaffinity(pid_t, size_t, cpu_set_t *);
 int sched_setaffinity(pid_t, size_t, const cpu_set_t *);
 
-#define __CPU_op_S(i, size, set, op) ( (i)/8U >= (size) ? 0 : \
-	(((unsigned long *)(set))[(i)/8/sizeof(long)] op (1UL<<((i)%(8*sizeof(long))))) )
+#define __CPU_op_S(i, size, set, op) \
+        ({ size_t __i = (i); \
+        (__i)/8U >= (size) ? 0 : \
+        (((unsigned long *)(set))[(__i)/8/sizeof(long)] op (1UL<<((__i)%(8*sizeof(long)))));})
 
 #define CPU_SET_S(i, size, set) __CPU_op_S(i, size, set, |=)
 #define CPU_CLR_S(i, size, set) __CPU_op_S(i, size, set, &=~)
